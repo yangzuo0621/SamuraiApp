@@ -106,6 +106,10 @@
     <Compile Include="Migrations\20180122091503_init.designer.cs">
       <DependentUpon>20180122091503_init.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20180123021837_JoinTable.cs" />
+    <Compile Include="Migrations\20180123021837_JoinTable.designer.cs">
+      <DependentUpon>20180123021837_JoinTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\SamuraiContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamuraiContext.cs" />

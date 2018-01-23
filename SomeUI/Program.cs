@@ -34,7 +34,9 @@ namespace SomeUI
             //FilteredEagerLoadViaProjectionNope();
 
             //ExplicitLoad();
-            ExplicitLoadWithChildFilter();
+            //ExplicitLoadWithChildFilter();
+            UsingRelatedDataForFiltersAndMore();
+
         }
 
         private static void InsertNewPkFkGraph()
@@ -211,6 +213,14 @@ namespace SomeUI
                 .Query()
                 .Where(q => q.Text.Contains("happy"))
                 .Load();
+        }
+
+        private static void UsingRelatedDataForFiltersAndMore()
+        {
+            _context = new SamuraiContext();
+            var samurais = _context.Samurais
+                .Where(s => s.Quotes.Any(q => q.Text.Contains("happy")))
+                .ToList();
         }
     }
 }

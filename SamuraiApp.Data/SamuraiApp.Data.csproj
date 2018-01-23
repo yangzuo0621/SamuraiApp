@@ -117,6 +117,10 @@
     <Compile Include="Migrations\20180123024257_SecretIdentity.designer.cs">
       <DependentUpon>20180123024257_SecretIdentity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20180123104222_AddSprocs.cs" />
+    <Compile Include="Migrations\20180123104222_AddSprocs.designer.cs">
+      <DependentUpon>20180123104222_AddSprocs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\SamuraiContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamuraiContext.cs" />

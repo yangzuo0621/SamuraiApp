@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
@@ -18,7 +20,9 @@ namespace SomeUI
             //MoreQueries();
             //RetrieveAndUpdateSamurai();
             //RetrieveAndUpdateMultipleSamurais();
-            RawSqlQuery();
+            //RawSqlCommand();
+            //RawSqlQuery();
+            RawSqlCommandWithOutput();
         }
 
         private static void RawSqlCommand()
@@ -30,14 +34,34 @@ namespace SomeUI
 
         private static void RawSqlQuery()
         {
-            var samurais = _context.Samurais.FromSql("Select * from Samurais")
-                            .OrderByDescending(s => s.Name)
-                            .ToList();
+            //var samurais = _context.Samurais.FromSql("Select * from Samurais")
+            //                .OrderByDescending(s => s.Name)
+            //                .Where(s => s.Name.Contains("San"))
+            //                .ToList();
+            var namePart = "San";
+            var samurais = _context.Samurais
+                .FromSql("EXEC FilterSamuraiByNamePart {0}", namePart)
+                .OrderByDescending(s => s.Name).ToList();
+
             samurais.ForEach(s => Console.WriteLine(s.Name));
             Console.WriteLine();
         }
 
-        private static void QueryWIthNonSql()
+        private static void RawSqlCommandWithOutput()
+        {
+            var procResult = new SqlParameter
+            {
+                ParameterName = "@procResult",
+                SqlDbType = SqlDbType.VarChar,
+                Direction = ParameterDirection.Output,
+                Size = 50
+            };
+            _context.Database.ExecuteSqlCommand(
+                "EXEC FindLongestName @procResult OUT", procResult);
+            Console.WriteLine($"Longest name: {procResult.Value}");
+        }
+
+        private static void QueryWithNonSql()
         {
             var samurais = _context.Samurais
                 .Select(s => new { newName = ReverseString(s.Name) })

@@ -28,10 +28,13 @@ namespace SomeUI
             //EagerLoadWithMultipleBranches();
             //EagerLoadWithFromSql();
             //AnonymousTypeViaProjection();
-            AnonymousViaProjectionWithRelated();
+            //AnonymousViaProjectionWithRelated();
             //RelatedObjectsFixup();
             //EagerLoadViaProjectionNotQuite();
             //FilteredEagerLoadViaProjectionNope();
+
+            //ExplicitLoad();
+            ExplicitLoadWithChildFilter();
         }
 
         private static void InsertNewPkFkGraph()
@@ -191,6 +194,23 @@ namespace SomeUI
                 .ToList();
         }
 
+        private static void ExplicitLoad()
+        {
+            _context = new SamuraiContext();
+            var samurai = _context.Samurais.FirstOrDefault();
+            _context.Entry(samurai).Collection(s => s.Quotes).Load();
+            _context.Entry(samurai).Reference(s => s.SecretIdentity).Load();
+        }
 
+        private static void ExplicitLoadWithChildFilter()
+        {
+            _context = new SamuraiContext();
+            var samurai = _context.Samurais.FirstOrDefault();
+            _context.Entry(samurai)
+                .Collection(s => s.Quotes)
+                .Query()
+                .Where(q => q.Text.Contains("happy"))
+                .Load();
+        }
     }
 }

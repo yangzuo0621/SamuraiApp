@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 
@@ -12,129 +9,96 @@ namespace SomeUI
     internal class Program
     {
         private static SamuraiContext _context = new SamuraiContext();
+
         private static void Main(string[] args)
         {
-            //InsertSamurai();
-            //InsertMultipleSamurais();
-            //SimpleSamuraiQuery();
-            //MoreQueries();
-            //RetrieveAndUpdateSamurai();
-            //RetrieveAndUpdateMultipleSamurais();
-            //RawSqlCommand();
-            //RawSqlQuery();
-            RawSqlCommandWithOutput();
+            _context.Database.EnsureCreated();
+            //InsertNewPkFkGraph();
+            //InsertNewPkFkGraphMultipleChildren();
+            //InsertNewOneToOneGraph();
+            //AddChildToExistingObjectWhileTracked();
+            //AddOneToOneToExistingObjectWhileTracked();
+            //AddBattles();
+            AddManyToManyWithObjects();
+            AddManyToManyWithObjects();
         }
 
-        private static void RawSqlCommand()
+        private static void InsertNewPkFkGraph()
         {
-            var affected = _context.Database.ExecuteSqlCommand(
-                "update samurais set Name=REPLACE(Name, 'San', 'Nan')");
-            Console.WriteLine($"Affected rows {affected}");
-        }
-
-        private static void RawSqlQuery()
-        {
-            //var samurais = _context.Samurais.FromSql("Select * from Samurais")
-            //                .OrderByDescending(s => s.Name)
-            //                .Where(s => s.Name.Contains("San"))
-            //                .ToList();
-            var namePart = "San";
-            var samurais = _context.Samurais
-                .FromSql("EXEC FilterSamuraiByNamePart {0}", namePart)
-                .OrderByDescending(s => s.Name).ToList();
-
-            samurais.ForEach(s => Console.WriteLine(s.Name));
-            Console.WriteLine();
-        }
-
-        private static void RawSqlCommandWithOutput()
-        {
-            var procResult = new SqlParameter
+            var samurai = new Samurai
             {
-                ParameterName = "@procResult",
-                SqlDbType = SqlDbType.VarChar,
-                Direction = ParameterDirection.Output,
-                Size = 50
+                Name = "Kambei Shimada",
+                Quotes = new List<Quote>
+                {
+                    new Quote { Text = "I've come to save you" }
+                }
             };
-            _context.Database.ExecuteSqlCommand(
-                "EXEC FindLongestName @procResult OUT", procResult);
-            Console.WriteLine($"Longest name: {procResult.Value}");
-        }
-
-        private static void QueryWithNonSql()
-        {
-            var samurais = _context.Samurais
-                .Select(s => new { newName = ReverseString(s.Name) })
-                .ToList();
-            samurais.ForEach(s => Console.WriteLine(s.newName));
-            Console.WriteLine();
-        }
-
-        private static string ReverseString(string value)
-        {
-            var stringChar = value.AsEnumerable();
-            return string.Concat(stringChar.Reverse());
-        }
-
-        private static void DeleteWhileTracked()
-        {
-            var samurai = _context.Samurais.FirstOrDefault(s => s.Name == "Kambei Shimada");
-            _context.Samurais.Remove(samurai);
-            // alternates:
-            // _context.Remove(samurai);
-            // _context.Entry(samurai).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-            // _context.Samurais.Remove(_context.Samurais.Find(1));
-            _context.SaveChanges();
-        }
-
-        private static void DeleteMany()
-        {
-            var samurais = _context.Samurais.Where(s => s.Name.Contains("o"));
-            _context.Samurais.RemoveRange(samurais);
-            // alternate
-            //_context.RemoveRange(samurais);
-            _context.SaveChanges();
-        }
-
-        private static void RetrieveAndUpdateMultipleSamurais()
-        {
-            var samurais = _context.Samurais.ToList();
-            samurais.ForEach(s => s.Name += "San");
-            _context.SaveChanges();
-        }
-
-        private static void RetrieveAndUpdateSamurai()
-        {
-            var samurai = _context.Samurais.FirstOrDefault();
-            samurai.Name += "San";
-            _context.SaveChanges();
-        }
-
-        private static void MoreQueries()
-        {
-            var samurais = _context.Samurais.Where(s => s.Name == "Sampson").ToList();
-        }
-
-        private static void SimpleSamuraiQuery()
-        {
-            using (var context = new SamuraiContext())
-            {
-                var samurais = context.Samurais.ToList();
-            }
-        }
-
-        private static void InsertMultipleSamurais()
-        {
-            var samurai = new Samurai { Name = "Julie" };
-            var samuraiSammy = new Samurai { Name = "Sampson" };
-            _context.Samurais.AddRange(new List<Samurai> { samurai, samuraiSammy });
-            _context.SaveChanges();
-        }
-
-        private static void InsertSamurai()
-        {
-            var samurai = new Samurai { Name = "Julie" };
             _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void InsertNewPkFkGraphMultipleChildren()
+        {
+            var samurai = new Samurai
+            {
+                Name = "Kyuzo",
+                Quotes = new List<Quote>
+                {
+                    new Quote { Text = "Watch out for my sharp sword!" },
+                    new Quote { Text = "I told you to watch out for the sharp sword!" }
+                }
+            };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void InsertNewOneToOneGraph()
+        {
+            var samurai = new Samurai { Name = "Shichiroji" };
+            samurai.SecretIdentity = new SecretIdentity { RealName = "Julie" };
+            _context.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void AddChildToExistingObjectWhileTracked()
+        {
+            var samurai = _context.Samurais.First();
+            samurai.Quotes.Add(new Quote { Text = "I bet you're happy that I've saved you!" });
+            _context.SaveChanges();
+        }
+
+        private static void AddOneToOneToExistingObjectWhileTracked()
+        {
+            var samurai = _context.Samurais.FirstOrDefault(s => s.SecretIdentity == null);
+            samurai.SecretIdentity = new SecretIdentity { RealName = "Sampson" };
+            _context.SaveChanges();
+        }
+
+        private static void AddBattles()
+        {
+            _context.Battles.AddRange(
+                new Battle { Name = "Battle of Shiroyama", StartDate = new DateTime(1877, 9, 24), EndDate = new DateTime(1877, 9, 24) },
+                new Battle { Name = "Siege of Osaka", StartDate = new DateTime(1614, 1, 1), EndDate = new DateTime(1615, 12, 31) },
+                new Battle { Name = "Boshin War", StartDate = new DateTime(1868, 1, 1), EndDate = new DateTime(1869, 1, 1) }
+            );
+            _context.SaveChanges();
+        }
+
+        private static void AddManyToManyWithFks()
+        {
+            _context = new SamuraiContext();
+            var sb = new SamuraiBattle { SamuraiId = 1, BattleId = 1 };
+            _context.SamuraiBattles.Add(sb);
+            _context.SaveChanges();
+        }
+
+        private static void AddManyToManyWithObjects()
+        {
+            _context = new SamuraiContext();
+            var samurai = _context.Samurais.FirstOrDefault();
+            var battle = _context.Battles.FirstOrDefault();
+            _context.SamuraiBattles.Add(
+             new SamuraiBattle { Samurai = samurai, Battle = battle });
             _context.SaveChanges();
         }
     }

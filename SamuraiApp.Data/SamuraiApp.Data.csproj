@@ -121,6 +121,10 @@
     <Compile Include="Migrations\20180123104222_AddSprocs.designer.cs">
       <DependentUpon>20180123104222_AddSprocs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20180123111243_AddedSamuraiBattlesToContext.cs" />
+    <Compile Include="Migrations\20180123111243_AddedSamuraiBattlesToContext.designer.cs">
+      <DependentUpon>20180123111243_AddedSamuraiBattlesToContext.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\SamuraiContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamuraiContext.cs" />

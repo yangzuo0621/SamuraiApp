@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using SamuraiApp.Domain;
 
 namespace SamuraiApp.Data
@@ -21,9 +23,14 @@ namespace SamuraiApp.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
+            optionsBuilder
+                .UseLoggerFactory(MyLoggerFactory)
+                .UseSqlServer(
                 "Server = (localdb)\\mssqllocaldb; Database = SamuraiData; Trusted_Connection = True; "
             );
+            optionsBuilder.EnableSensitiveDataLogging();
         }
+
+        public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) });
     }
 }

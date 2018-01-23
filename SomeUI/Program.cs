@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 
@@ -19,8 +20,18 @@ namespace SomeUI
             //AddChildToExistingObjectWhileTracked();
             //AddOneToOneToExistingObjectWhileTracked();
             //AddBattles();
-            AddManyToManyWithObjects();
-            AddManyToManyWithObjects();
+            //AddManyToManyWithFks();
+            //AddManyToManyWithObjects();
+
+            //EagerLoadWithInclude();
+            //EagerLoadManyToManyAkaChildrenGrandchildren();
+            //EagerLoadWithMultipleBranches();
+            //EagerLoadWithFromSql();
+            //AnonymousTypeViaProjection();
+            AnonymousViaProjectionWithRelated();
+            //RelatedObjectsFixup();
+            //EagerLoadViaProjectionNotQuite();
+            //FilteredEagerLoadViaProjectionNope();
         }
 
         private static void InsertNewPkFkGraph()
@@ -101,5 +112,85 @@ namespace SomeUI
              new SamuraiBattle { Samurai = samurai, Battle = battle });
             _context.SaveChanges();
         }
+
+        private static void EagerLoadWithInclude()
+        {
+            _context = new SamuraiContext();
+            var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+        }
+
+        private static void EagerLoadManyToManyAkaChildrenGrandchildren()
+        {
+            _context = new SamuraiContext();
+            var samuraiWithBattles = _context.Samurais.Include(s => s.SamuraiBattles)
+                .ThenInclude(sb => sb.Battle)
+                .ToList();
+        }
+
+        private static void EagerLoadWithMultipleBranches()
+        {
+            _context = new SamuraiContext();
+            var samurais = _context.Samurais
+                .Include(s => s.SecretIdentity)
+                .Include(s => s.Quotes)
+                .ToList();
+        }
+
+        private static void EagerLoadWithFromSql()
+        {
+            var samurais = _context.Samurais.FromSql("select * from samurais")
+                .Include(s => s.Quotes)
+                .ToList();
+        }
+
+        private static void AnonymousTypeViaProjection()
+        {
+            _context = new SamuraiContext();
+            var quotes = _context.Quotes
+                .Select(q => new { q.Id, q.Text })
+                .ToList();
+        }
+
+        private static void AnonymousViaProjectionWithRelated()
+        {
+            _context = new SamuraiContext();
+            var samurais = _context.Samurais
+                .Select(s => new
+                {
+                    s.Id,
+                    s.SecretIdentity.RealName,
+                    QuoteCount = s.Quotes.Count
+                })
+                .ToList();
+        }
+
+        private static void RelatedObjectsFixup()
+        {
+            _context = new SamuraiContext();
+            var sumarai = _context.Samurais.Find(1);
+            var quotes = _context.Quotes.Where(q => q.SamuraiId == 1).ToList();
+        }
+
+        private static void EagerLoadViaProjectionNotQuite()
+        {
+            _context = new SamuraiContext();
+            var samurais = _context.Samurais
+                .Select(s => new { Samurai = s, Quotes = s.Quotes })
+                .ToList();
+        }
+
+        private static void FilteredEagerLoadViaProjectionNope()
+        {
+            _context = new SamuraiContext();
+            var sumarais = _context.Samurais
+                .Select(s => new
+                {
+                    Samurai = s,
+                    Quotes = s.Quotes.Where(q => q.Text.Contains("happy")).ToList()
+                })
+                .ToList();
+        }
+
+
     }
 }

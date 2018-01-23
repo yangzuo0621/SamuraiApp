@@ -32,6 +32,11 @@ namespace SamuraiApp.Data
             optionsBuilder.EnableSensitiveDataLogging();
         }
 
-        public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) });
+        //public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) });
+        public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] 
+        {
+            new ConsoleLoggerProvider((category, level) =>
+                level == LogLevel.Information, true)
+        });
     }
 }

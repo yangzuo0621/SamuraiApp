@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using SamuraiApp.Domain;
+using System;
+using System.Linq;
 
 namespace SamuraiApp.Data
 {
@@ -17,8 +19,15 @@ namespace SamuraiApp.Data
             modelBuilder.Entity<SamuraiBattle>()
                 .HasKey(s => new { s.BattleId, s.SamuraiId });
 
-            //modelBuilder.Entity<Samurai>()
-            //    .Property(s => s.SecretIdentity).IsRequired();
+            //modelBuilder.Entity<Samurai>().Property(s => s.SecretIdentity).IsRequired();
+            //modelBuilder.Entity<Samurai>().Property<DateTime>("LastModified");
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                modelBuilder.Entity(entityType.Name).Property<DateTime>("LastModified");
+                modelBuilder.Entity(entityType.Name).Ignore("IsDirty");
+            }
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -27,9 +36,20 @@ namespace SamuraiApp.Data
             optionsBuilder
                 .UseLoggerFactory(MyLoggerFactory)
                 .UseSqlServer(
-                "Server = (localdb)\\mssqllocaldb; Database = SamuraiRelatedData; Trusted_Connection = True; "
+                "Server = (localdb)\\mssqllocaldb; Database = SamuraiWpfData; Trusted_Connection = True; "
             );
             optionsBuilder.EnableSensitiveDataLogging();
+        }
+
+        public override int SaveChanges()
+        {
+            foreach (var entry in ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified))
+            {
+                entry.Property("LastModified").CurrentValue = DateTime.Now;
+            }
+
+            return base.SaveChanges();
         }
 
         //public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) });

@@ -35,8 +35,16 @@ namespace SomeUI
 
             //ExplicitLoad();
             //ExplicitLoadWithChildFilter();
-            UsingRelatedDataForFiltersAndMore();
+            //UsingRelatedDataForFiltersAndMore();
 
+            //DisconnectedMethods.AddGraphAllNew();
+            //DisconnectedMethods.AddGraphWithKeyValues();
+            //DisconnectedMethods.AttachGraphAllNew();
+            //DisconnectedMethods.AttachGraphWithKeyValues();
+            //DisconnectedMethods.UpdateGraphAllNew();
+            //DisconnectedMethods.UpdateGraphWithKeyValues();
+            //DisconnectedMethods.DeleteGraphAllNew();
+            //DisconnectedMethods.DeleteGraphWithKeyValues();
         }
 
         private static void InsertNewPkFkGraph()

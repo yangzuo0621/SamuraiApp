@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 using System;
@@ -110,6 +111,140 @@ namespace SomeUI
                 DisplayState(es, "DeleteGraphWithKeyValues");
             }
         }
+
+        public static void AddGraphViaEntryAllNew()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie" };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is new" });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Added;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AddGraphViaEntryAllNew");
+            }
+        }
+
+        public static void AddGraphViaEntryWithKeyValues()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie", Id = 1 };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is not new", Id = 1 });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Added;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AddGraphViaEntryWithKeyValues");
+            }
+        }
+
+        public static void AttachGraphViaEntryAllNew()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie" };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is new" });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Detached;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AttachGraphViaEntryAllNew");
+            }
+        }
+
+        public static void AttachGraphViaEntryWithKeyValues()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie", Id = 1 };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is not new", Id = 1 });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Detached;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AttachGraphViaEntryWithKeyValues");
+            }
+        }
+
+        public static void UpdateGraphViaEntryAllNew()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie" };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is new" });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Modified;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "UpdateGraphViaEntryAllNew");
+            }
+        }
+
+        public static void UpdateGraphViaEntryWithKeyValues()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie", Id = 1 };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is not new", Id = 1 });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Modified;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "UpdateGraphViaEntryWithKeyValues");
+            }
+        }
+        public static void DeleteGraphViaEntryAllNew()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie" };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is new" });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Deleted;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "DeleteGraphViaEntryAllNew");
+            }
+        }
+
+        public static void DeleteGraphViaEntryWithKeyValues()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie", Id = 1 };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is not new", Id = 1 });
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samuraiGraph).State = EntityState.Deleted;
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "DeleteGraphViaEntryWithKeyValues");
+            }
+        }
+
+        public static void ChangeStateUsingEntry()
+        {
+            var samurai = new Samurai { Name = "She Who Changes State", Id = 1 };
+            using (var context = new SamuraiContext())
+            {
+                context.Entry(samurai).State = EntityState.Modified;
+                Console.WriteLine("Change State Using Entry");
+                DisplayState(context.ChangeTracker.Entries().ToList(), "Initial State");
+
+                context.Entry(samurai).State = EntityState.Added;
+                DisplayState(context.ChangeTracker.Entries().ToList(), "New State");
+                context.SaveChanges();
+            }
+        }
+        public static void AddGraphViaTrackGraphAllNew()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie" };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is new" });
+            using (var context = new SamuraiContext())
+            {
+                context.ChangeTracker.TrackGraph(samuraiGraph, e => e.Entry.State = EntityState.Added);
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AddGraphViaEntryAllNew");
+            }
+        }
+
+        public static void AddGraphViaTrackGraphWithKeyValues()
+        {
+            var samuraiGraph = new Samurai { Name = "Julie", Id = 1 };
+            samuraiGraph.Quotes.Add(new Quote { Text = "This is not new", Id = 1 });
+            using (var context = new SamuraiContext())
+            {
+                context.ChangeTracker.TrackGraph(samuraiGraph, e => e.Entry.State = EntityState.Added);
+                var es = context.ChangeTracker.Entries().ToList();
+                DisplayState(es, "AddGraphViaEntryWithKeyValues");
+            }
+        }
+
 
     }
 }

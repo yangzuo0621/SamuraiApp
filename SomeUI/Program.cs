@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 
@@ -16,7 +17,39 @@ namespace SomeUI
             //SimpleSamuraiQuery();
             //MoreQueries();
             //RetrieveAndUpdateSamurai();
-            RetrieveAndUpdateMultipleSamurais();
+            //RetrieveAndUpdateMultipleSamurais();
+            RawSqlQuery();
+        }
+
+        private static void RawSqlCommand()
+        {
+            var affected = _context.Database.ExecuteSqlCommand(
+                "update samurais set Name=REPLACE(Name, 'San', 'Nan')");
+            Console.WriteLine($"Affected rows {affected}");
+        }
+
+        private static void RawSqlQuery()
+        {
+            var samurais = _context.Samurais.FromSql("Select * from Samurais")
+                            .OrderByDescending(s => s.Name)
+                            .ToList();
+            samurais.ForEach(s => Console.WriteLine(s.Name));
+            Console.WriteLine();
+        }
+
+        private static void QueryWIthNonSql()
+        {
+            var samurais = _context.Samurais
+                .Select(s => new { newName = ReverseString(s.Name) })
+                .ToList();
+            samurais.ForEach(s => Console.WriteLine(s.newName));
+            Console.WriteLine();
+        }
+
+        private static string ReverseString(string value)
+        {
+            var stringChar = value.AsEnumerable();
+            return string.Concat(stringChar.Reverse());
         }
 
         private static void DeleteWhileTracked()
@@ -24,9 +57,9 @@ namespace SomeUI
             var samurai = _context.Samurais.FirstOrDefault(s => s.Name == "Kambei Shimada");
             _context.Samurais.Remove(samurai);
             // alternates:
-            //_context.Remove(samurai);
-            //_context.Entry(samurai).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-            //_context.Samurais.Remove(_context.Samurais.Find(1));
+            // _context.Remove(samurai);
+            // _context.Entry(samurai).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            // _context.Samurais.Remove(_context.Samurais.Find(1));
             _context.SaveChanges();
         }
 
